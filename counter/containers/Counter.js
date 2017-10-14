@@ -1,20 +1,50 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Button, ActivityIndicator } from 'react-native';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import * as counterActionCreators from '../actions/CounterActions';
 
-export default class Counter extends React.Component {
+
+class Counter extends React.Component {
   render() {
+    const { counter, actions } = this.props;
     return (
-        <View style={stylesheet.container}>
-          <Text>Start for react-native and redux</Text>
+      <View>
+        <View style={styles.container}>
+          <Text style={{ fontSize: 50}}>Counter</Text>
+          { counter.loading ? <ActivityIndicator size={Platform.OS === 'ios' ? "large" : 64}/> : <Text style={{ color: 'red', fontSize: 50}}>{counter.count}</Text>}
         </View>
+        <View style={styles.layoutButtonContainer}>
+          <Button disabled={counter.loading} onPress={actions.increment} title="Increase" />
+          <Button disabled={counter.loading} onPress={actions.decrement} title="Decrease" />
+        </View>
+      </View>
     );
   }
 }
 
-const stylesheet = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
-    flex: 1, 
-    justifyContent: 'center',
-    alignItems: 'center'
+    margin: 50,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  layoutButtonContainer: {
+    margin: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-around'
   }
 });
+
+function select(state) {
+  return {
+    counter: state.counter
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return { actions: bindActionCreators(counterActionCreators, dispatch) }
+}
+
+export default connect(select, mapDispatchToProps)(Counter);
